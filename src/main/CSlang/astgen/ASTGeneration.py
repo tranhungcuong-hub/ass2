@@ -189,19 +189,39 @@ class ASTGeneration(CSlangVisitor):
         return None
     
     def visitForStatement(self, ctx:CSlangParser.ForStatementContext):
-        return None
+        return For(self.visit(ctx.initStm()), self.visit(ctx.conStm()), self.visit(ctx.postStm()), self.visit(ctx.block_stm()))
     
     def visitInitStm(self, ctx:CSlangParser.InitStmContext):
-        return None
+        return Assign(self.visitID(ctx.ID()), self.visit(ctx.exp()))
     
     def visitConStm(self, ctx:CSlangParser.ConStmContext):
-        return None
+        return BinaryOp(self.visit(ctx.getChild(1)), self.visitID(ctx.ID()), self,visitINTLIT(ctx.INTLIT()))
     
     def visitPostStm(self, ctx:CSlangParser.PostStmContext):
-        return None
+        return Assign(self.visitID(ctx.ID()), self.visit(ctx.exp()))
     
     def visitInvocationStatement(self, ctx:CSlangParser.InvocationStatementContext):
-        return None
+        if ctx.method_access():
+            return self.visit(ctx.method_access())
+        if ctx.static_method_access():
+            return self.visit(ctx.static_method_access())
 
     def visitMain_invocation_stm(self, ctx:CSlangParser.Main_invocation_stmContext):
-        return None
+        if ctx.method_access():
+            return self.visit(ctx.method_access())
+        if ctx.static_method_access():
+            return self.visit(ctx.static_method_access())
+        if ctx.static_attr_access():
+            return self.visit(ctx.static_attr_access())
+        if ctx.instance_access():
+            return self.visit(ctx.instance_access())
+        
+    # helpers:
+    def visitID(self, id):
+        return Id(id.getText())
+    
+    def visitOP(self, op):
+        return op.getText()
+    
+    def visitINTLIT(self, intlit):
+        return IntLiteral(int(intlit.getText()))
