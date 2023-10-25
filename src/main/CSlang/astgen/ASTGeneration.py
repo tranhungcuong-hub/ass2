@@ -284,21 +284,21 @@ class ASTGeneration(CSlangVisitor):
         if ctx.exp():
             return self.visit(ctx.exp())
         elif ctx.ID():
-            return self.visit(ctx.ID())
+            return self.visitID(ctx.ID())
         elif ctx.AT_ID():
-            return self.visit(ctx.AT_ID())
+            return self.visitID(ctx.AT_ID())
         elif ctx.SELF():
-            return self.visit(ctx.SELF())
+            return SelfLiteral()
         elif ctx.NULL():
-            return self.visit(ctx.NULL())
+            return NullLiteral()
         elif ctx.INTLIT():
-            return self.visit(ctx.INTLIT())
+            return self.visitINTLIT(ctx.INTLIT())
         elif ctx.FLOATLIT():
-            return self.visit(ctx.FLOATLIT())
+            return self.visitFLOATLIT(ctx.FLOATLIT())
         elif ctx.BOOLLIT():
-            return self.visit(ctx.BOOLLIT())
+            return self.visitBOOLLIT(ctx.BOOLLIT())
         elif ctx.STRINGLIT():
-            return self.visit(ctx.STRINGLIT())
+            return self.visitSTRINGLIT(ctx.STRINGLIT())
         elif ctx.array_lit():
             return self.visit(ctx.array_lit())
 
@@ -331,8 +331,7 @@ class ASTGeneration(CSlangVisitor):
             return FieldAccess(None, self.visit(ctx.AT_ID()))
 
     def visitMethod_access(self, ctx: CSlangParser.Method_accessContext):
-        obj = self.visit(ctx.exp())
-        method = self.visit(ctx.ID())
+        method = self.visitID(ctx.ID())
         explist =  self.visit(ctx.exp_list())
         print(obj, " ", method, " ", explist)
         return CallStmt(obj, method, explist)
@@ -451,7 +450,27 @@ class ASTGeneration(CSlangVisitor):
             return self.visit(ctx.static_attr_access())
         if ctx.instance_access():
             return self.visit(ctx.instance_access())
+    
+    def visitArray_lit(self, ctx: CSlangParser.Array_litContext):
+        value = [self.visit(ctx.element())] + self.visit(ctx.arraylit_list())
+        return ArrayLiteral(value)
 
+    def visitElement(self, ctx: CSlangParser.ElementContext):
+        if ctx.INTLIT():
+            return self.visitINTLIT(ctx.INTLIT())
+        elif ctx.FLOATLIT():
+            return self.visitFLOATLIT(ctx.FLOATLIT())
+        elif ctx.BOOLLIT():
+            return self.visitBOOLLIT(ctx.BOOLLIT())
+        elif ctx.STRINGLIT():
+            return self.visitSTRINGLIT(ctx.STRINGLIT())
+        else:
+            return self.visit(ctx.array_lit())
+    
+    def visitArraylit_list(self, ctx: CSlangParser.Arraylit_listContext):
+        if ctx.getChildCount() == 0:
+            return []
+        return [self.visit(ctx.element())] + self.visit(ctx.arraylit_list())
     # helpers:
     def visitID(self, id):
         return Id(id.getText())
@@ -470,3 +489,5 @@ class ASTGeneration(CSlangVisitor):
     
     def visitBOOLLIT(self, boollit):
         return BooleanLiteral(boollit.getText() == 'true')
+    
+    
