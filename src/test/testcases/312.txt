@@ -1,8 +1,0 @@
-class main {
-            func bar(x: int) {
-                if (x < 5)
-                    foo();
-                else
-                    bar();
-            }
-        }

@@ -1,3 +1,3 @@
 class main {
-            constructor(a: int, b: float) {}
+            func constructor (a: int, b: float) {}
         }

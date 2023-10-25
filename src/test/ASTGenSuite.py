@@ -75,10 +75,21 @@ class ASTGenSuite(unittest.TestCase):
     def test_310(self):
         """Test for a constructor with parameters"""
         input = """class main {
-            constructor(a: int, b: float) {}
+            func constructor (a: int, b: float) {}
         }"""
-        expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(constructor),[Param(Id(a),IntType), Param(Id(b),FloatType)],NoneType,Block([]))])"""
+        expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(constructor),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([]))])])"""
         self.assertTrue(TestAST.test(input, expect, 310))
+        
+    def test_311(self):
+        """Test for a constructor with parameters"""
+        input =	"""class main{
+        func foo  (a: int, b: float):void {}
+
+        func @main():void{
+            io.printInt(4);
+        }}"""
+        expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(foo),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([])),MethodDecl(Id(@main),[],VoidType,Block([Call(Id(io),Id(printInt),[IntLit(4)])]))])])"""
+        self.assertTrue(TestAST.test(input, expect, 311))
 
     # def test_class_with_two_decl_program(self):
     #     """More complex program"""

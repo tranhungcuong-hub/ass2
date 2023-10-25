@@ -121,7 +121,7 @@ class ASTGeneration(CSlangVisitor):
         return (id, param_list, return_typ)
 
     def visitCon_method(self, ctx: CSlangParser.Con_methodContext):
-        id = ctx.getChild(1).getText()
+        id = Id(ctx.CONSTRUCTOR().getText())
         param_list = self.visit(ctx.param_list())
         return_typ = VoidType()
         return (id, param_list, return_typ)
@@ -131,7 +131,7 @@ class ASTGeneration(CSlangVisitor):
             return []
         else:
             param = [self.visit(ctx.param())] + self.visit(ctx.param_plist())
-            return reduce(lambda x, y: x + [VarDecl(i, y[-1]).toParam() for i in y[:-1]], param, [])
+            return reduce(lambda x, y: x + [VarDecl(i, y[-1]) for i in y[:-1]], param, [])
 
     def visitParam_plist(self, ctx: CSlangParser.Param_plistContext):
         if ctx.getChildCount() == 0:
@@ -140,9 +140,9 @@ class ASTGeneration(CSlangVisitor):
             return [self.visit(ctx.param())] + self.visit(ctx.param_plist())
 
     def visitParam(self, ctx: CSlangParser.ParamContext):
-        params = [self.visit(ctx.params())]
-
-        return params.extend([self.visit(ctx.type_name())])
+        params = [self.visitID(ctx.ID())] + self.visit(ctx.params())
+        params.extend([self.visit(ctx.type_name())])
+        return params
 
     def visitParams(self, ctx: CSlangParser.ParamsContext):
         if ctx.getChildCount() == 0:
@@ -192,7 +192,7 @@ class ASTGeneration(CSlangVisitor):
     # /**** Expressions ****/
     def visitExp(self, ctx: CSlangParser.ExpContext):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp1(0))
+            return self.visit(ctx.exp1())
         return BinaryOp(ctx.CONCATENATION().getText(),self.visit(ctx.exp1(0)),self.visit(ctx.exp1(1)))
 
     def visitExp1(self, ctx: CSlangParser.Exp1Context):
