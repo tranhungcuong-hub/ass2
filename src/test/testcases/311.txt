@@ -1,0 +1,5 @@
+class main {
+            func foo(a: int, b: float) {
+                a.foo(1, 2.0);
+            }
+        }

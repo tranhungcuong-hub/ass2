@@ -1,0 +1,3 @@
+class main {
+            constructor(a: int, b: float) {}
+        }
