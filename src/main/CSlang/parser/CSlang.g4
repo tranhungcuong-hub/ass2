@@ -70,15 +70,16 @@ exp3: exp3 (ADD | SUB) exp4 | exp4;
 exp4: exp4 (MUL | INT_DIV | DIV | MOD) exp5 | exp5;
 exp5: NOT exp5 | exp6;
 exp6: SUB exp6 | exp7;
-exp7: exp8 LSB exp RSB | exp8;
-exp8: exp8 DOT ID | exp8 DOT ID (LB exp_list RB | LB RB) | exp9;
-exp9: exp10 DOT AT_ID | exp9 DOT AT_ID (LB exp_list RB | LB RB) | exp10;
-exp10: obj_creation | operands;
+exp7: exp7 index_operator | exp8;
+exp8: exp8 DOT exp9 | exp9;
+exp9: exp10 DOT exp10 | exp10;
+exp10: NEW exp10 LB exp_list RB | operands;
 
 operands: AT_ID LB exp_list RB | ID LB exp_list RB | AT_ID | ID | SELF | NULL | INTLIT | FLOATLIT | BOOLLIT | STRINGLIT | LB exp RB | array_lit;
 
-exp_list: exp exp_plist | ;
-exp_plist: CM exp exp_plist | ;
+exp_list: exp CM exp_list | exp;
+
+index_operator: LSB exp RSB index_operator  | LSB exp RSB;
 
 /******* MEMBER ACCESS *******/
 instance_access: exp DOT ID ;
@@ -86,8 +87,6 @@ static_attr_access: (ID DOT)? AT_ID ;
 method_access: exp DOT ID LB exp_list RB ;
 static_method_access: (ID DOT)? AT_ID LB exp_list RB ;
 
-/******* OBJECT CREATION *******/
-obj_creation: NEW ID LB exp_list RB ;
 
 /****************************************************************************/
 /*																	 		*/

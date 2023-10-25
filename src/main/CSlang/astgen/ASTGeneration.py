@@ -191,46 +191,127 @@ class ASTGeneration(CSlangVisitor):
 
     # /**** Expressions ****/
     def visitExp(self, ctx: CSlangParser.ExpContext):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp1(0))
+        return BinaryOp(ctx.CONCATENATION().getText(),self.visit(ctx.exp1(0)),self.visit(ctx.exp1(1)))
 
     def visitExp1(self, ctx: CSlangParser.Exp1Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp2(0))
+        if ctx.LT():
+            return BinaryOp(ctx.LT().getText(),self.visit(ctx.exp2(0)),self.visit(ctx.exp2(1)))
+        elif ctx.LE():
+            return BinaryOp(ctx.LE().getText(),self.visit(ctx.exp2(0)),self.visit(ctx.exp2(1)))
+        elif ctx.GT():
+            return BinaryOp(ctx.GT().getText(),self.visit(ctx.exp2(0)),self.visit(ctx.exp2(1)))
+        elif ctx.GE():
+            return BinaryOp(ctx.GE().getText(),self.visit(ctx.exp2(0)),self.visit(ctx.exp2(1)))
+        elif ctx.EQUAL():
+            return BinaryOp(ctx.EQUAL().getText(),self.visit(ctx.exp2(0)),self.visit(ctx.exp2(1)))
+        elif ctx.NOT_EQUAL():
+            return BinaryOp(ctx.NOT_EQUAL().getText(),self.visit(ctx.exp2(0)),self.visit(ctx.exp2(1)))
 
     def visitExp2(self, ctx: CSlangParser.Exp2Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp3(0))
+        elif ctx.AND():
+            return BinaryOp(ctx.AND().getText(), self.visit(ctx.exp2()), self.visit(ctx.exp3()))
+        elif ctx.OR():
+            return BinaryOp(ctx.OR().getText(), self.visit(ctx.exp2()), self.visit(ctx.exp3()))
 
     def visitExp3(self, ctx: CSlangParser.Exp3Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp4(0))
+        elif ctx.ADD():
+            return BinaryOp(ctx.ADD().getText(), self.visit(ctx.exp3()), self.visit(ctx.exp4()))
+        elif ctx.SUB():
+            return BinaryOp(ctx.SUB().getText(), self.visit(ctx.exp3()), self.visit(ctx.exp4()))
 
     def visitExp4(self, ctx: CSlangParser.Exp4Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp5(0))
+        elif ctx.MUL():
+            return BinaryOp(ctx.MUL().getText(), self.visit(ctx.exp4()), self.visit(ctx.exp5()))
+        elif ctx.DIV():
+            return BinaryOp(ctx.DIV().getText(), self.visit(ctx.exp4()), self.visit(ctx.exp5()))
+        elif ctx.MOD():
+            return BinaryOp(ctx.MOD().getText(), self.visit(ctx.exp4()), self.visit(ctx.exp5()))
+        elif ctx.INT_DIV():
+            return BinaryOp(ctx.INT_DIV().getText(), self.visit(ctx.exp4()), self.visit(ctx.exp5()))
 
     def visitExp5(self, ctx: CSlangParser.Exp5Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp6(0))
+        else:
+            return UnaryOp(ctx.NOT().getText(), self.visit(ctx.exp5()))
 
     def visitExp6(self, ctx: CSlangParser.Exp6Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp7(0))
+        else:
+            return UnaryOp(ctx.SUB().getText(), self.visit(ctx.exp6()))
 
     def visitExp7(self, ctx: CSlangParser.Exp7Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp8(0))
+        else:
+            return ArrayCell(self.visit(ctx.exp7()), self.visit(ctx.index_operator()))
 
     def visitExp8(self, ctx: CSlangParser.Exp8Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp9(0))
+        else:
+            return FieldAccess(self.visit(ctx.exp8()), self.visit(ctx.exp9()))
 
     def visitExp9(self, ctx: CSlangParser.Exp9Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.exp10(0))
+        else:
+            return FieldAccess(self.visit(ctx.exp10(0)), self.visit(ctx.exp10(1)))
 
     def visitExp10(self, ctx: CSlangParser.Exp10Context):
-        return None
+        if ctx.getChildCount() == 1:
+            return self.visit(ctx.operands())
+        else:
+            return NewExpr(self.visit(ctx.exp10()), self.visit(ctx.exp_list()))
 
     def visitOperands(self, ctx: CSlangParser.OperandsContext):
-        return None
+        if ctx.exp():
+            return self.visit(ctx.exp())
+        elif ctx.ID():
+            return self.visit(ctx.ID())
+        elif ctx.AT_ID():
+            return self.visit(ctx.AT_ID())
+        elif ctx.SELF():
+            return self.visit(ctx.SELF())
+        elif ctx.NULL():
+            return self.visit(ctx.NULL())
+        elif ctx.INTLIT():
+            return self.visit(ctx.INTLIT())
+        elif ctx.FLOATLIT():
+            return self.visit(ctx.FLOATLIT())
+        elif ctx.BOOLLIT():
+            return self.visit(ctx.BOOLLIT())
+        elif ctx.STRINGLIT():
+            return self.visit(ctx.STRINGLIT())
+        elif ctx.array_lit():
+            return self.visit(ctx.array_lit())
 
     def visitExp_list(self, ctx: CSlangParser.Exp_listContext):
-        return None
-
-    def visitExp_plist(self, ctx: CSlangParser.Exp_plistContext):
-        return None
+        if ctx.getChildCount() == 1:
+            return [self.visit(ctx.exp())]
+        else:
+            res = []
+            res = res + [self.visit(ctx.exp())] + self.visit(ctx.exp_list())
+            return res
+    
+    def visitIndex_operator(self, ctx:CSlangParser.Index_operatorContext):
+        expr = [self.visit(ctx.exp())]
+        if ctx.getChildCount() == 3:
+            return expr
+        else: 
+            exprs = self.visit(ctx.index_operator())
+            return expr + exprs
 
     # /**** Member Access ****/
     def visitInstance_access(self, ctx: CSlangParser.Instance_accessContext):
@@ -251,10 +332,48 @@ class ASTGeneration(CSlangVisitor):
 
     # /**** Statements ****/
     def visitStatement(self, ctx: CSlangParser.StatementContext):
-        return None
+        if ctx.variableDeclaration():
+            return self.visit(ctx.variableDeclaration())
+        elif ctx.arrayAssignmentStatement():
+            return self.visit(ctx.arrayAssignmentStatement())
+        elif ctx.assignmentStatement():
+            return self.visit(ctx.assignmentStatement())
+        elif ctx.returnStatement():
+            return self.visit(ctx.returnStatement())
+        elif ctx.continueStatement():
+            return self.visit(ctx.continueStatement())
+        elif ctx.breakStatement():
+            return self.visit(ctx.breakStatement())
+        elif ctx.ifStatement():
+            return self.visit(ctx.ifStatement())
+        elif ctx.invocationStatement():
+            return self.visit(ctx.invocationStatement())
+        elif ctx.forStatement():
+            return self.visit(ctx.forStatement())
+        elif ctx.block_stm():
+            return self.visit(ctx.block_stm())
 
     def visitMain_stm(self, ctx: CSlangParser.Main_stmContext):
-        return None
+        if ctx.variableDeclaration():
+            return self.visit(ctx.variableDeclaration())
+        elif ctx.arrayAssignmentStatement():
+            return self.visit(ctx.arrayAssignmentStatement())
+        elif ctx.assignmentStatement():
+            return self.visit(ctx.assignmentStatement())
+        elif ctx.returnStatement():
+            return self.visit(ctx.returnStatement())
+        elif ctx.continueStatement():
+            return self.visit(ctx.continueStatement())
+        elif ctx.breakStatement():
+            return self.visit(ctx.breakStatement())
+        elif ctx.ifStatement():
+            return self.visit(ctx.ifStatement())
+        elif ctx.main_invocation_stm():
+            return self.visit(ctx.main_invocation_stm())
+        elif ctx.forStatement():
+            return self.visit(ctx.forStatement())
+        elif ctx.block_stm():
+            return self.visit(ctx.block_stm())
 
     def visitVariableDeclaration(self, ctx: CSlangParser.VariableDeclarationContext):
         return None
