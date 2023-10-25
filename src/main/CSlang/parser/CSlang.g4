@@ -123,9 +123,7 @@ variableDeclaration: attribute_decl;
 
 arrayDeclaration: VAR ID (CM ID)* CL type_name LSB INTLIT RSB SM;
 
-assignmentStatement: (scalarVariable | indexExpression | exp) ASSINGMENT exp SM;
-scalarVariable : ID;
-indexExpression : ID RSB INTLIT RSB;
+assignmentStatement: exp ASSINGMENT exp SM;
 
 arrayAssignmentStatement: ID LSB exp RSB ASSINGMENT exp SM;
 

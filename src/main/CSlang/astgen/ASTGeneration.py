@@ -184,7 +184,7 @@ class ASTGeneration(CSlangVisitor):
             return self.visitID(ctx.ID())
 
     def visitArray_type(self, ctx: CSlangParser.Array_typeContext):
-        return None
+        return ArrayType(ctx.INTLIT(), ctx.type_name())
 
     def visitAttr_type(self, ctx: CSlangParser.Attr_typeContext):
         return self.visit(ctx.type_name()) if ctx.type_name() else self.visit(ctx.array_type())
@@ -383,19 +383,19 @@ class ASTGeneration(CSlangVisitor):
             return self.visit(ctx.block_stm())
 
     def visitVariableDeclaration(self, ctx: CSlangParser.VariableDeclarationContext):
-        return None
+        return ctx.visit(ctx.attribute_decl())
 
     def visitArrayDeclaration(self, ctx: CSlangParser.ArrayDeclarationContext):
         return None
 
     def visitAssignmentStatement(self, ctx: CSlangParser.AssignmentStatementContext):
-        return None
+        return Assign(self.visit(ctx.exp(0)), self.visit(ctx.exp(1)))
 
-    def visitScalarVariable(self, ctx: CSlangParser.ScalarVariableContext):
-        return None
+    # def visitScalarVariable(self, ctx: CSlangParser.ScalarVariableContext):
+    #     return ctx.exp()
 
-    def visitIndexExpression(self, ctx: CSlangParser.IndexExpressionContext):
-        return None
+    # def visitIndexExpression(self, ctx: CSlangParser.IndexExpressionContext):
+    #     return ArrayCell()
 
     def visitArrayAssignmentStatement(self, ctx: CSlangParser.ArrayAssignmentStatementContext):
         return None
