@@ -20,7 +20,7 @@ program_member_list: (programMainDecl | attribute_decl | method_decl)* ;
 programMainDecl: FUNC '@main' LB RB CL return_type main_block_stm;
 
 class_decl: CLASS (ID INHERITANCE)? ID LP members* RP;
-members: (attribute_decl | method_decl);
+members: (attribute_decl | method_decl | programMainDecl);
 
 /**** attribute_decl ****/
 attribute_decl: mutability (ID | AT_ID) val_list_decl val_decl SM | mutability id_list CL attr_type SM;

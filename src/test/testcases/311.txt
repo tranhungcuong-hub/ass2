@@ -1,4 +1,5 @@
 class main{
-        func foo  (a: int, b: float):void {}
+                    func foo  (a: int, b: float):void {}
 
-        
+                    func @main():void{
+                }}

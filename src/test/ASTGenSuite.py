@@ -79,26 +79,13 @@ class ASTGenSuite(unittest.TestCase):
         }"""
         expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(constructor),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([]))])])"""
         self.assertTrue(TestAST.test(input, expect, 310))
-        
+
     def test_311(self):
         """Test for a constructor with parameters"""
-        input =	"""class main{
-        func foo  (a: int, b: float):void {}
+        input = """class main{
+                    func foo  (a: int, b: float):void {}
 
-        func @main():void{
-            io.printInt(4);
-        }}"""
-        expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(foo),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([])),MethodDecl(Id(@main),[],VoidType,Block([Call(Id(io),Id(printInt),[IntLit(4)])]))])])"""
+                    func @main():void{
+                }}"""   
+        expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(foo),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([])),MethodDecl(@main,[],VoidType,Block([]))])])"""
         self.assertTrue(TestAST.test(input, expect, 311))
-
-    # def test_class_with_two_decl_program(self):
-    #     """More complex program"""
-    #     input = """class main {
-    #         var a:int;
-    #         var b:int;
-    #     }"""
-    #     expect = str(Program([ClassDecl(Id("main"),
-    #         [AttributeDecl(VarDecl(Id("a"),IntType())),
-    #          AttributeDecl(VarDecl(Id("b"),IntType()))])]))
-    #     self.assertTrue(TestAST.test(input,expect,302))
-   

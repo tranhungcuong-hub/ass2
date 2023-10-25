@@ -45,7 +45,12 @@ class ASTGeneration(CSlangVisitor):
         return ClassDecl(classname, memlist, parentname)
     
     def visitMembers(self, ctx: CSlangParser.MembersContext):
-        return self.visit(ctx.attribute_decl()) if ctx.attribute_decl() else self.visit(ctx.method_decl())
+        if ctx.attribute_decl():
+            return self.visit(ctx.attribute_decl()) 
+        elif ctx.method_decl():
+            return self.visit(ctx.method_decl())
+        else:
+            return self.visit(ctx.programMainDecl())
 
     # /**** attribute_decl ****/
     def visitAttribute_decl(self, ctx: CSlangParser.Attribute_declContext):
