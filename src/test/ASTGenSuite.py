@@ -89,3 +89,14 @@ class ASTGenSuite(unittest.TestCase):
                 }}"""   
         expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(foo),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([])),MethodDecl(@main,[],VoidType,Block([]))])])"""
         self.assertTrue(TestAST.test(input, expect, 311))
+
+    def test_312(self):
+        """Test for a constructor with parameters"""
+        input = """class main{
+                    func foo  (a: int, b: float):void {}
+
+                    func @main():void{
+                        io.printInt(4);
+                }}"""   
+        expect = """Program([ClassDecl(Id(main),[MethodDecl(Id(foo),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([])),MethodDecl(@main,[],VoidType,Block([Call(None,[None])]))])])"""
+        self.assertTrue(TestAST.test(input, expect, 312))

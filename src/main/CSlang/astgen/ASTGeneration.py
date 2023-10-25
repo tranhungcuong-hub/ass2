@@ -197,7 +197,7 @@ class ASTGeneration(CSlangVisitor):
     # /**** Expressions ****/
     def visitExp(self, ctx: CSlangParser.ExpContext):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp1())
+            return self.visit(ctx.exp1(0))
         return BinaryOp(ctx.CONCATENATION().getText(),self.visit(ctx.exp1(0)),self.visit(ctx.exp1(1)))
 
     def visitExp1(self, ctx: CSlangParser.Exp1Context):
@@ -218,7 +218,7 @@ class ASTGeneration(CSlangVisitor):
 
     def visitExp2(self, ctx: CSlangParser.Exp2Context):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp3(0))
+            return self.visit(ctx.exp3())
         elif ctx.AND():
             return BinaryOp(ctx.AND().getText(), self.visit(ctx.exp2()), self.visit(ctx.exp3()))
         elif ctx.OR():
@@ -226,7 +226,7 @@ class ASTGeneration(CSlangVisitor):
 
     def visitExp3(self, ctx: CSlangParser.Exp3Context):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp4(0))
+            return self.visit(ctx.exp4())
         elif ctx.ADD():
             return BinaryOp(ctx.ADD().getText(), self.visit(ctx.exp3()), self.visit(ctx.exp4()))
         elif ctx.SUB():
@@ -234,7 +234,7 @@ class ASTGeneration(CSlangVisitor):
 
     def visitExp4(self, ctx: CSlangParser.Exp4Context):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp5(0))
+            return self.visit(ctx.exp5())
         elif ctx.MUL():
             return BinaryOp(ctx.MUL().getText(), self.visit(ctx.exp4()), self.visit(ctx.exp5()))
         elif ctx.DIV():
@@ -246,25 +246,25 @@ class ASTGeneration(CSlangVisitor):
 
     def visitExp5(self, ctx: CSlangParser.Exp5Context):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp6(0))
+            return self.visit(ctx.exp6())
         else:
             return UnaryOp(ctx.NOT().getText(), self.visit(ctx.exp5()))
 
     def visitExp6(self, ctx: CSlangParser.Exp6Context):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp7(0))
+            return self.visit(ctx.exp7())
         else:
             return UnaryOp(ctx.SUB().getText(), self.visit(ctx.exp6()))
 
     def visitExp7(self, ctx: CSlangParser.Exp7Context):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp8(0))
+            return self.visit(ctx.exp8())
         else:
             return ArrayCell(self.visit(ctx.exp7()), self.visit(ctx.index_operator()))
 
     def visitExp8(self, ctx: CSlangParser.Exp8Context):
         if ctx.getChildCount() == 1:
-            return self.visit(ctx.exp9(0))
+            return self.visit(ctx.exp9())
         else:
             return FieldAccess(self.visit(ctx.exp8()), self.visit(ctx.exp9()))
 
@@ -331,9 +331,10 @@ class ASTGeneration(CSlangVisitor):
             return FieldAccess(None, self.visit(ctx.AT_ID()))
 
     def visitMethod_access(self, ctx: CSlangParser.Method_accessContext):
-        obj = self.visit(ctx.exp(0))
+        obj = self.visit(ctx.exp())
         method = self.visit(ctx.ID())
         explist =  self.visit(ctx.exp_list())
+        print(obj, " ", method, " ", explist)
         return CallStmt(obj, method, explist)
 
     def visitStatic_method_access(self, ctx: CSlangParser.Static_method_accessContext):
