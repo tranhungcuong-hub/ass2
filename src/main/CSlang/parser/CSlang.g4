@@ -143,7 +143,7 @@ initStm: ID ASSINGMENT exp SM;
 conStm: ID (LT | GT | LE | GE) INTLIT SM;
 postStm: ID ASSINGMENT exp;
 
-invocationStatement: method_access SM | static_method_access SM;
+invocationStatement: method_access SM | static_method_access SM | static_attr_access SM;
 main_invocation_stm: method_access SM | static_method_access SM | static_attr_access SM | instance_access SM;
 
 /****** COMMENTS *****/

@@ -315,20 +315,27 @@ class ASTGeneration(CSlangVisitor):
 
     # /**** Member Access ****/
     def visitInstance_access(self, ctx: CSlangParser.Instance_accessContext):
-        return None
+        obj = self.visit(ctx.exp(0))
+        method = self.visit(ctx.ID())
+        return FieldAccess(obj, method)
 
     def visitStatic_attr_access(self, ctx: CSlangParser.Static_attr_accessContext):
-        return None
+        if ctx.ID():
+            return FieldAccess(ctx.ID(), self.visit(ctx.AT_ID()))
+        else:
+            return FieldAccess(None, self.visit(ctx.AT_ID()))
 
     def visitMethod_access(self, ctx: CSlangParser.Method_accessContext):
-        return None
+        obj = self.visit(ctx.exp(0))
+        method = self.visit(ctx.ID())
+        explist =  self.visit(ctx.exp_list())
+        return CallStmt(obj, method, explist)
 
     def visitStatic_method_access(self, ctx: CSlangParser.Static_method_accessContext):
-        return None
-
-    # /**** OBJECT CREATION ****/
-    def visitObj_creation(self, ctx: CSlangParser.Obj_creationContext):
-        return None
+        obj = self.visit(ctx.ID()) if ctx.ID() else None
+        method = self.visit(ctx.AT_ID())
+        explist =  self.visit(ctx.exp_list())
+        return CallStmt(obj, method, explist)
 
     # /**** Statements ****/
     def visitStatement(self, ctx: CSlangParser.StatementContext):
