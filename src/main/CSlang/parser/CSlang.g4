@@ -20,7 +20,7 @@ program_member_list: (programMainDecl | attribute_decl | method_decl)* ;
 programMainDecl: FUNC '@main' LB RB CL return_type main_block_stm;
 
 class_decl: CLASS (ID INHERITANCE)? ID LP members* RP;
-members: (attribute_decl | method_decl);
+members: (programMainDecl | attribute_decl | method_decl);
 
 /**** attribute_decl ****/
 attribute_decl: mutability (ID | AT_ID) val_list_decl val_decl SM | mutability id_list CL attr_type SM;
@@ -225,7 +225,7 @@ FLOATLIT:
 INTLIT: '0' | [1-9] [0-9]*;
 
 array_lit: LSB element arraylit_list RSB ;
-element: (INTLIT | FLOATLIT | BOOLLIT | STRINGLIT | exp);
+element: (INTLIT | FLOATLIT | BOOLLIT | STRINGLIT | array_lit);
 arraylit_list: CM element arraylit_list | ;
 
 ID: [_a-zA-Z][_a-zA-Z0-9]*;
