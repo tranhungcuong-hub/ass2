@@ -10,14 +10,14 @@ options{
 	language=Python3;
 }
 
-program: '"""' class_decl* class_prog? '"""' EOF | class_decl* class_prog? EOF ;
+program: class_decl* class_prog? EOF;
 
 
 
 /**** class ****/
 class_prog: CLASS 'Program' (INHERITANCE ID)? LP program_member_list RP;
-program_member_list: (program_main_decl | attribute_decl | method_decl)* ;
-program_main_decl: FUNC '@main' LB RB CL return_type main_block_stm;
+program_member_list: (programMainDecl | attribute_decl | method_decl)* ;
+programMainDecl: FUNC '@main' LB RB CL return_type main_block_stm;
 
 class_decl: CLASS ID (INHERITANCE ID)? LP members* RP;
 members: (attribute_decl | method_decl);
