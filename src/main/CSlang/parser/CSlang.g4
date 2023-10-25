@@ -15,11 +15,11 @@ program: class_decl* class_prog? EOF;
 
 
 /**** class ****/
-class_prog: CLASS 'Program' (INHERITANCE ID)? LP program_member_list RP;
+class_prog: CLASS (ID INHERITANCE)? 'Program'  LP program_member_list RP;
 program_member_list: (programMainDecl | attribute_decl | method_decl)* ;
 programMainDecl: FUNC '@main' LB RB CL return_type main_block_stm;
 
-class_decl: CLASS ID (INHERITANCE ID)? LP members* RP;
+class_decl: CLASS (ID INHERITANCE)? ID LP members* RP;
 members: (attribute_decl | method_decl);
 
 /**** attribute_decl ****/
@@ -32,7 +32,7 @@ id_plist: CM (AT_ID | ID) id_plist | ;
 
 //val_list: val_decl val_plist;
 //val_plist: CM val_decl val_plist | ;
-val_decl: (exp | INTLIT | FLOATLIT | STRINGLIT | BOOLLIT);
+val_decl: (INTLIT | FLOATLIT | STRINGLIT | BOOLLIT | exp);
 
 /**** method_decl ****/
 method_decl: (nor_method | con_method) block_stm;
@@ -49,7 +49,7 @@ params: CM ID params | ;
 return_type: (type_name | VOID | array_type);
 
 /**** block statement ****/
-block_stm: LP statement* RP | LP RP;
+block_stm: LP statement* RP;
 
 main_block_stm: LP main_stm* RP;
 
@@ -136,7 +136,7 @@ continueStatement: CONTINUE SM;
 
 breakStatement: BREAK SM;
 
-ifStatement: IF (LP statement* RP)? exp block_stm elseStatement?;
+ifStatement: IF (LP statement RP)? exp block_stm elseStatement?;
 elseStatement: ELSE block_stm ;
 
 forStatement: FOR initStm conStm postStm block_stm;
