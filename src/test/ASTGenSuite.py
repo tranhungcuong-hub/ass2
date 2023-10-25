@@ -16,13 +16,21 @@ class ASTGenSuite(unittest.TestCase):
         expect = """Program([ClassDecl(Id(main),[AttributeDecl(VarDecl(Id(a),IntType))])])"""
         self.assertTrue(TestAST.test(input,expect,301))
         
-    def test_30(self):
+    def test_302(self):
         """More complex program"""
         input = """class main {
             var a,b:int;
         }"""
         expect = """Program([ClassDecl(Id(main),[AttributeDecl(VarDecl(Id(a),IntType)),AttributeDecl(VarDecl(Id(b),IntType))])])"""
         self.assertTrue(TestAST.test(input,expect,302))
+        
+    def test_303(self):
+        """More complex program"""
+        input = """class Program {
+            var a,b:int;
+        }"""
+        expect = """Program([ClassDecl(Program,[AttributeDecl(VarDecl(Id(a),IntType)),AttributeDecl(VarDecl(Id(b),IntType))])])"""
+        self.assertTrue(TestAST.test(input,expect,303))
     
     # def test_class_with_two_decl_program(self):
     #     """More complex program"""

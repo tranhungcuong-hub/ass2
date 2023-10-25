@@ -25,10 +25,12 @@ class ASTGeneration(CSlangVisitor):
         if(ctx.getChildCount() == 0):
             return []
         else:
-            return None
+            decl = []
+            [decl.extend(self.visit(ctx.getChild(i))) for i in range(ctx.getChildCount())]
+            return decl
 
     def visitProgramMainDecl(self, ctx: CSlangParser.ProgramMainDeclContext):
-        return ctx.programMainDecl(self.visitMain_block_stm())
+        return Method()
 
     def visitClass_decl(self, ctx: CSlangParser.Class_declContext):
         classname = self.visitID(ctx.ID(0))
