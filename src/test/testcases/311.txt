@@ -6,4 +6,3 @@ class main{
             io.printInt(4);
         }
         }
-        

@@ -1,1 +1,2 @@
 Program([ClassDecl(Id(main),[MethodDecl(Id(foo),[Param(Id(a),IntType),Param(Id(b),FloatType)],VoidType,Block([])),MethodDecl(@main,[],VoidType,Block([Call(Id(io),Id(printInt),[IntLit(4)])]))])])
+

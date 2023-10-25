@@ -45,9 +45,12 @@ class ASTGeneration(CSlangVisitor):
         return ClassDecl(classname, memlist, parentname)
     
     def visitMembers(self, ctx: CSlangParser.MembersContext):
-        if ctx.programMainDecl():
+        if ctx.attribute_decl():
+            return self.visit(ctx.attribute_decl()) 
+        elif ctx.method_decl():
+            return self.visit(ctx.method_decl())
+        else:
             return self.visit(ctx.programMainDecl())
-        return self.visit(ctx.attribute_decl()) if ctx.attribute_decl() else self.visit(ctx.method_decl())
 
     # /**** attribute_decl ****/
     def visitAttribute_decl(self, ctx: CSlangParser.Attribute_declContext):
@@ -328,9 +331,9 @@ class ASTGeneration(CSlangVisitor):
             return FieldAccess(None, self.visit(ctx.AT_ID()))
 
     def visitMethod_access(self, ctx: CSlangParser.Method_accessContext):
-        obj = self.visit(ctx.exp())
         method = self.visitID(ctx.ID())
         explist =  self.visit(ctx.exp_list())
+        print(obj, " ", method, " ", explist)
         return CallStmt(obj, method, explist)
 
     def visitStatic_method_access(self, ctx: CSlangParser.Static_method_accessContext):
