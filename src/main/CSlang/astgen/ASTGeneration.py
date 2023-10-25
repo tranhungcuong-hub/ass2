@@ -1,6 +1,6 @@
 from CSlangVisitor import CSlangVisitor
 from CSlangParser import CSlangParser
-from src.main.CSlang.utils.AST import *
+from AST import *
 from functools import reduce
 
 class ASTGeneration(CSlangVisitor):
@@ -8,54 +8,93 @@ class ASTGeneration(CSlangVisitor):
     def visitProgram(self, ctx: CSlangParser.ProgramContext):
         decl = []
         if ctx.class_decl():
-            decl.extends([self.visit(x) for x in ctx.class_decl()])
+            decl.extend([self.visit(x) for x in ctx.class_decl()])
         if ctx.class_prog():
-            decl.extends([self.visit(ctx.class_prog())])
-
+            decl.extend([self.visit(ctx.class_prog())])
+        
         return Program(decl)
 
     # /**** class ****/
     def visitClass_prog(self, ctx: CSlangParser.Class_progContext):
-        return ClassDecl(ctx.ID().getText(), self.visitProgram_member_list())
+        classname = ctx.getChild(1).getText()
+        memlist = self.visit(ctx.program_member_list())
+        parentname = self.visitID(ctx.ID()) if ctx.ID() else None
+        return ClassDecl(classname, memlist, parentname)
 
     def visitProgram_member_list(self, ctx: CSlangParser.Program_member_listContext):
         if(ctx.getChildCount() == 0):
-            return self.visitProgram_main_decl()
-        elif(ctx.getChildCount() == 1):
-            return self.visitAttribute_decl()
+            return []
         else:
-            return self.visitMethod_decl()
+            return None
 
     def visitProgramMainDecl(self, ctx: CSlangParser.ProgramMainDeclContext):
         return ctx.programMainDecl(self.visitMain_block_stm())
 
-    def visitClass_decl(self, ctx: CSlangParser.class_decl):
-        return ClassDecl(ctx.ID().getText(), self.visitMembers())
+    def visitClass_decl(self, ctx: CSlangParser.Class_declContext):
+        classname = self.visitID(ctx.ID(0))
+        memlist = []
+        [memlist.extend(self.visit(x)) for x in ctx.members()]
+        parentname = self.visitID(ctx.ID(1)) if ctx.ID(1) else None
+        return ClassDecl(classname, memlist, parentname)
+    
+    def visitMembers(self, ctx: CSlangParser.MembersContext):
+        return self.visit(ctx.attribute_decl()) if ctx.attribute_decl() else self.visit(ctx.method_decl())
 
     # /**** attribute_decl ****/
     def visitAttribute_decl(self, ctx: CSlangParser.Attribute_declContext):
-        return AttributeDecl(self.visitVal_list_decl())
+        # no init
+        if ctx.id_list():
+            id_list = self.visit(ctx.id_list())
+            attr_type = self.visit(ctx.attr_type())
+            return [AttributeDecl(VarDecl(x, attr_type)) for x in id_list]
+        # init
+        else:
+            mutability = self.visit(ctx.mutability())
+            if mutability == 'const':
+                id = [self.visitID(ctx.ID())] if ctx.ID() else [self.visitID(ctx.AT_ID())]
+                return 
+            else:
+                return    
 
     def visitVal_list_decl(self, ctx: CSlangParser.Val_list_declContext):
-        return None
+        if ctx.ASSIGN():
+            return [('type', self.visit(ctx.attr_type()))]
+        else:
+            id = [self.visitID(ctx.ID())] if ctx.ID() else [self.visitID(ctx.AT_ID())]
+            val_decl = self.visit(ctx.var_decl())
+            return [(id, val_decl)] + self.visit(ctx.val_list_decl())
 
     def visitMutability(self, ctx: CSlangParser.MutabilityContext):
-        return None
+        return 'const' if ctx.CONST() else 'var'
 
     def visitId_list(self, ctx: CSlangParser.Id_listContext):
-        return None
+        id = [self.visitID(ctx.ID())] if ctx.ID() else [self.visitID(ctx.AT_ID())]
+        return id + self.visit(ctx.id_plist())
 
     def visitId_plist(self, ctx: CSlangParser.Id_plistContext):
-        return None
+        if ctx.getChildCount() == 0:
+            return []
+        else:
+            id = [self.visitID(ctx.ID())] if ctx.ID() else [self.visitID(ctx.AT_ID())]
+            return id + self.visit(ctx.id_plist())
 
-    def visitVal_list(self, ctx: CSlangParser.Val_listContext):
-        return None
+    # def visitVal_list(self, ctx: CSlangParser.Val_listContext):
+    #     return None
 
-    def visitVal_plist(self, ctx: CSlangParser.Val_plistContext):
-        return None
+    # def visitVal_plist(self, ctx: CSlangParser.Val_plistContext):
+    #     return None
 
     def visitVal_decl(self, ctx: CSlangParser.Val_declContext):
-        return None
+        if ctx.exp():
+            return self.visit(ctx.exp())
+        elif ctx.INTLIT():
+            return self.visitINTLIT(ctx.INTLIT())
+        elif ctx.FLOATLIT():
+            return self.visitFLOATLIT(ctx.FLOATLIT())
+        elif ctx.STRINGLIT():
+            return self.visitSTRINGLIT(ctx.STRINGLIT())
+        elif ctx.BOOLLIT():
+            return self.visitBOOLLIT(ctx.BOOLLIT())
 
     # /**** method_decl ****/
     def visitMethod_decl(self, ctx: CSlangParser.Method_declContext):
@@ -89,13 +128,22 @@ class ASTGeneration(CSlangVisitor):
         return None
 
     def visitType_name(self, ctx: CSlangParser.Type_nameContext):
-        return None
+        if ctx.INT():
+            return IntType()
+        elif ctx.FLOAT():
+            return FloatType()
+        elif ctx.STRING():
+            return StringType()
+        elif ctx.BOOL():
+            return BoolType()
+        else:
+            return self.visitID(ctx.ID())
 
     def visitArray_type(self, ctx: CSlangParser.Array_typeContext):
         return None
 
     def visitAttr_type(self, ctx: CSlangParser.Attr_typeContext):
-        return None
+        return self.visit(ctx.type_name()) if ctx.type_name() else self.visit(ctx.array_type())
 
     # /**** Expressions ****/
     def visitExp(self, ctx: CSlangParser.ExpContext):
@@ -235,3 +283,12 @@ class ASTGeneration(CSlangVisitor):
 
     def visitINTLIT(self, intlit):
         return IntLiteral(int(intlit.getText()))
+
+    def visitFLOATLIT(self, floatlit):
+        return FloatLiteral(float(floatlit.getText()))
+    
+    def visitSTRINGLIT(self, strlit):
+        return StringLiteral(strlit.getText())
+    
+    def visitBOOLLIT(self, boollit):
+        return BooleanLiteral(boollit.getText() == 'true')

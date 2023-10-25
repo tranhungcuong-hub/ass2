@@ -30,8 +30,8 @@ mutability: (CONST | VAR);
 id_list: (AT_ID | ID) id_plist;
 id_plist: CM (AT_ID | ID) id_plist | ;
 
-val_list: val_decl val_plist;
-val_plist: CM val_decl val_plist | ;
+//val_list: val_decl val_plist;
+//val_plist: CM val_decl val_plist | ;
 val_decl: (exp | INTLIT | FLOATLIT | STRINGLIT | BOOLLIT);
 
 /**** method_decl ****/
